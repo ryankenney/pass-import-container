@@ -14,15 +14,33 @@ I needed a secure way to convert my KeePass database to Unix Pass
    so we want to do it with no internet access
 
     * This is a difficult thing to do in rootless podman (no access to firewall rules),
-      so I simply run it when the internet is disconnected (or in an offline VM)
+      so I simply run it with no network access (`--net none`)
 
 
 Use
 ----------------
 
-With rootless podman installed, we can build and run with:
+First, load your public gpg key into the system default location (`~/.gnupg`).
+The import process does not need the private key.
 
-```
-bash build.sh
-bash run.sh --help
-```
+Ensure rootless podman is installed
+
+Build the docker image:
+
+    bash build.sh
+
+Run the import process:
+
+    bash run.sh <key-id> <database-file>
+
+For example:
+
+    bash run.sh user@example.com ~/my-database.kdbx
+
+... and a fresh password store is created here:
+
+    ./target/pass/
+
+NOTE: Your input database is also copied to this directory:
+
+    ./target/
