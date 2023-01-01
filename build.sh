@@ -10,6 +10,9 @@ set -x
 cat << 'EOF' > Dockerfile
 FROM alpine:latest
 
+# TODO: Auto-identify the latest version through GitHub API
+ENV PASS_IMPORT_VERSION=3.4
+
 RUN \
     # Show each comand as we build
     set +x && \
@@ -23,7 +26,7 @@ RUN \
         # Install git (for cloning)
         git \
         # Install pass-import dependencies
-        python3 && \
+        python3 gpg-agent && \
 
     # Wipe apk cache (for smaller image)
     rm -rf /var/cache/apk/* && \
@@ -33,9 +36,13 @@ RUN \
 
     # Install pass-import dependencies
     python3 -m ensurepip && \
+    pip3 install requests setuptools pyaml zxcvbn pykeepass && \
 
     # Install pass-import
-    pip3 install pass-import
+    wget "https://github.com/roddhjav/pass-import/releases/download/v${PASS_IMPORT_VERSION}/pass-import-${PASS_IMPORT_VERSION}.tar.gz" && \
+    tar xzf "pass-import-${PASS_IMPORT_VERSION}.tar.gz" && \
+    cd "pass-import-${PASS_IMPORT_VERSION}" && \
+    python3 setup.py install
 
 # Enable pass extensions (for the import extension)
 ENV PASSWORD_STORE_ENABLE_EXTENSIONS=true
