@@ -6,7 +6,7 @@ Theory of Use
 
 I needed a secure way to convert my KeePass database to Unix Pass
 
-1. I wanted to do the conversion in an isolated environment, so I did this in docker
+1. I wanted to do the conversion in an isolated environment, so I did this in a container
 
     * I happen to be using rootless podman to protect the host
 

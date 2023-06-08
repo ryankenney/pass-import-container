@@ -15,17 +15,22 @@ function print_usage_and_exit() {
 
 USAGE: $SCRIPT_FILE <key-id>
 
-  key-id: The key ID to initialize the output repo with (to encrypt all entries with).
+  key-id:
+    The key ID to initialize the output repo with (to encrypt all entries with).
+  database-file:
+    The Keepass database file to import
 
 EOF
     exit 1
 }
 
-if [[ ! $# -eq 1 ]]; then
+if [[ ! $# -eq 2 ]]; then
     print_usage_and_exit
 fi
 
 KEY_ID="$1"
+shift
+DATABASE_FILE="$1"
 shift
 
 mkdir -p "$SCRIPT_DIR/target/pass"
@@ -43,18 +48,22 @@ podman run --rm -it \
   --name pass-container pass-container \
   init "$KEY_ID"
 
+# Copy database file where it can be used
+cp "$DATABASE_FILE" target/
+DATABASE_FILENAME="$(basename "$DATABASE_FILE")"
+
 # Launch container for use with pass-import
 podman run --rm -it \
   --security-opt label=disable \
   -e PASSWORD_STORE_DIR=/target/pass \
   -e PASSWORD_STORE_GIT=/target/pass \
   -v "$PWD/target:/target:rw" \
-  -v "$PWD/import:/import:ro" \
   `# TODO: Figure out how to run with ":ro" set` \
   -v "$HOME/.gnupg:/root/.gnupg:rw" \
   `# When host ".gnupg" is exposed to the container, disable the network` \
   --network none \
   --workdir /target/ \
-  --entrypoint /bin/bash \
-  --name pass-container pass-container
+  --name pass-container \
+  pass-container \
+  import keepass "$DATABASE_FILENAME" 
 
