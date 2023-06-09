@@ -45,7 +45,8 @@ podman run --rm -it \
   -v "$PWD/target:/target" \
   -v "$HOME/.gnupg:/root/.gnupg:ro" \
   --workdir /target/ \
-  --name pass-container pass-container \
+  --name pass-import-container \
+  pass-import-container:local-build \
   init "$KEY_ID"
 
 # Copy database file where it can be used
@@ -63,7 +64,7 @@ podman run --rm -it \
   `# When host ".gnupg" is exposed to the container, disable the network` \
   --network none \
   --workdir /target/ \
-  --name pass-container \
-  pass-container \
+  --name pass-import-container \
+  pass-import-container:local-build \
   import keepass "$DATABASE_FILENAME" 
 

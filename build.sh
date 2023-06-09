@@ -52,5 +52,5 @@ ENTRYPOINT ["pass"]
 EOF
 
 # TODO: Add --pull=newer when supported
-podman build --tag pass-container:local-build .
+podman build --tag pass-import-container:local-build .
 
